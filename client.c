@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         err(1, "exit ...");
         exit(1);
     }
-    int i, n;
+    int i, n, loginchk=1;
     char buf[BUF_SIZE+1];
     char tmpbuf[BUF_SIZE+1];
     char cmdbuf[BUF_SIZE+1];
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     int code = -1;
     enum CLIENT_STATE state = ST_NONE;
     char filename[BUF_SIZE], line[BUF_SIZE];
-
+	
     while ((n=recv(client, buf, sizeof(buf), MSG_PEEK)) > 0) {
         if (!running) break;
         for (i=0; i<n; i++) {
@@ -185,6 +185,29 @@ int main(int argc, char *argv[]) {
                 continue;
         }
         if (code >= RPL_ERR_UNKWNCMD) state = ST_NONE;
+	
+	
+	if(loginchk){			//처음에는 loginchk는 1
+	char ID[20];			//입력받은 id를 저장할 버퍼
+	char PASS[20];			//입력받은 password를 저장할 버퍼
+	send_str(client, "ID\r\n");	//server에 ID 명령어를 전송
+	printf("Enter ID : ");		
+	gets(ID);			//사용자에게 id 입력 요청
+	ID[strlen(ID)] = 0;		//ID 버퍼 맨 끝에 널값 추가
+	send_str(client, ID);		//server에 id 전송
+	printf("Enter PASSWORD : ");
+	gets(PASS);			//사용자에게 password 입력 요청
+	PASS[strlen(PASS)] = 0;		//PASS 버퍼 맨 끝에 널값 추가
+	send_str(client, PASS);		//server에 password 전송
+	char log[25];			//server에서 보낸 string을 저장할 버퍼
+	int length;
+	length=recv(client, log, 25, 0);//server에서 string 수신
+	printf("%s\n", log);		//log 버퍼에 저장된 string 출력(성공인지 실패인지)
+	loginchk = 0;
+	//login 과정을 했으므로 다시 로그인 요청을 하지 않도록 loginchk에 0 반환
+	if(strncmp(log, "401 LOGIN FAIL", 14)==0) exit(0);
+	}//server에서 수신한 string이 실패의 메시지이면 client ftp를 종료
+
 
         int valid = 0;
         while (!valid) {
