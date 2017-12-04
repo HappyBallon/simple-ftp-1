@@ -41,7 +41,8 @@ enum FTP_CMD {
     QUIT,
     MDTM,
     SIZE,
-    FTP_CMD_COUNT,
+    ID,
+    FTP_CMD_COUNT
 };
 
 struct ftp_cmd {
@@ -60,6 +61,8 @@ extern struct ftp_cmd FTP_CMD_LIST[FTP_CMD_COUNT];
 #define RPL_SYST 215
 #define RPL_RDY 220
 #define RPL_QUIT 221
+#define RPL_FAIL 401
+#define RPL_SUCCESS 230
 #define RPL_TRSFOK 226
 #define RPL_PASVOK 227
 #define RPL_NAMEOK 331
@@ -83,12 +86,11 @@ extern struct ftp_cmd FTP_CMD_LIST[FTP_CMD_COUNT];
 #define FTP_OK W("OK",RPL_OK)
 #define FTP_RDY W("Welcome to zTrix FTP", RPL_RDY)
 #define FTP_QUIT W("Welcome back", RPL_QUIT)
+#define FTP_FAIL W("LOGIN FAIL", RPL_FAIL)
+#define FTP_SUCCESS W("LOGIN SUCCESS", RPL_SUCCESS)
 #define FTP_HELP W("Help msg", RPL_OK)
 #define FTP_NAMEOK W("User name okay need password", RPL_NAMEOK)
-#define FTP_ERR_NAME W("Cannot find user name. Ask for administrator.", 530)
-#define FTP_NEED_LOGIN W("Need login. Login first.", 530)
 #define FTP_LOGIN W("User logged in proceed", RPL_LOGIN)
-#define FTP_LOGIN_FAIL W("Password wrong! Please login aggain.", 530)
 #define FTP_PWD W("\"%s\"", RPL_PWD)
 #define FTP_SYST W("UNIX", RPL_SYST)
 #define FTP_CTYPE W("data type changed to %c", RPL_OK)
