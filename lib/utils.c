@@ -76,8 +76,15 @@ int send_file(int peer, FILE *f) {
 /**
  *  -1 error opening file, -2 send file error, -3 close file error
  */
-int send_path(int peer, char *file, uint32_t offset) {
+int send_path(int peer, char *file, uint32_t offset,char *hash) {
     FILE *f = fopen(file, "rb");
+    fseek(f, 0, SEEK_END);
+    int size = ftell(f);
+    char data[size+1];
+    fread(data, 1, size, f);
+    integrity_check(data, hash);
+    printf("Hash Value : %s\n", hash);
+
     if (f) {
         fseek(f, offset, SEEK_SET);
         int st = send_file(peer, f);
@@ -308,4 +315,25 @@ void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
     to_bytes(h2, digest + 8);
     to_bytes(h3, digest + 12);
 }
+
+/**
+ * File Integrity
+ *
+ */
+void integrity_check(char data, char *hash)
+{
+    uint8_t result[16];
+    char tmp[5];
+    int i;
+    hash[0] = '\0';
+
+    for(i = 0; i < 1000000; i++) {
+	md5((uint8_t*)data, strlen(data), result);
+    }
+    for(i = 0; i < 16; i++) {
+	sprintf(tmp, "%2.2x", result[i]);
+	strcat(hash, tmp);
+    }
+}
+
 
