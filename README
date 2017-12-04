@@ -1,1 +1,9 @@
-FTP project for network course
+   -------------------------------------
+
+	Simple Ftp function adding
+
+       1. Login Fuction modified.
+       2. File integrity Checking added.
+       3. Database Connection added.
+
+   -------------------------------------
