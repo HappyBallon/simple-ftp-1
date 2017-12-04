@@ -1,9 +1,17 @@
-   -------------------------------------
+Simple Ftp Repository
+============
 
-	Simple Ftp function adding
+##수정된 기능
 
-       1. Login Fuction modified.
-       2. File integrity Checking added.
-       3. Database Connection added.
++ 로그인기능
++ 파일 무결성 검사
++ 데이터베이스 구축 (Fail)
 
-   -------------------------------------
+## MD5 Hash
+"'
+
+dddd
+
+"'
+
+
