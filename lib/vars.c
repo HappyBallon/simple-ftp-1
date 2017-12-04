@@ -29,6 +29,7 @@ struct ftp_cmd FTP_CMD_LIST[FTP_CMD_COUNT] = {
     {"SYST", SYST},
     {"QUIT", QUIT},
     {"MDTM", MDTM},
-    {"SIZE", SIZE}
+    {"SIZE", SIZE},
+    {"ID"  , ID  }
 };
 
