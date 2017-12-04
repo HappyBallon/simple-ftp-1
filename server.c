@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <errno.h>
+#include <mysql/mysql.h>//gcc compiler header /usr/include/mysql
 
 #include "vars.h"
 #include "zlog.h"
@@ -57,6 +58,88 @@ enum FTP_CMD parse_cmd(char *buf, int len) {
  * handle a newly accepted ftp session
  *
  */
+
+MYSQL *conn = NULL; //mysql connector
+#define IP "127.0.0.1" //localhost
+#define USER_ID "root"
+#define USER_PWD "murasakibara3"
+
+void CREATE_DB(){
+	conn = mysql_init(NULL);
+
+	if(conn == NULL){
+		fprintf(stderr, "%s\n", mysql_error(conn));
+		exit(1);
+	}
+
+	if(mysql_real_connect(conn, 
+		IP, USER_ID, USER_PWD, NULL, 0, NULL, 0) == NULL){
+			fprintf(stderr, "%s\n", mysql_error(conn));
+			mysql_close(conn);
+			exit(1);
+	}
+
+	char* CREATE_DB_QUERY = "CREATE DATABASE ftpServer_DB";
+	if(mysql_query(conn, CREATE_DB_QUERY)){
+		fprintf(stderr, "%s\n", mysql_error(conn)));
+		mysql_close(conn);
+		exit(1);
+	}
+
+	char* CREATE_TABLE_QUERY = "CREATE TABLE userInfo row INT AUTO_INCREMENT, ID varChar(20), PWD varchar(20), PRIMARYKEY(row)";
+	/*---------------------------------------------
+	  |row| Int          | AUTO_INCREMENT| PRIMARYKEY|
+	  |ID | varchar(20)|                  |             |
+	  |PWD| varChar(20)|					  |             |
+	  ----------------------------------------------*/
+	if(mysql_query(conn, CREATE_TABLE_QUERY)){
+		fprintf(stderr, "%s\n", mysql_error(conn));
+		mysql_close(conn);
+		exit(1);
+	}
+
+	char* DB_INIT_QUERY = "INSERT INTO userInfo (ID, PWD) VALUES ('coolcs','password')");
+	if(mysql_query(conn, DB_INIT_QUERY)){
+		fprintf(stderr, "%s\n", mysql_error(conn));
+		mysql_close(conn);
+		exit(1);
+	}
+}
+
+void logInSeq(char* id, char* password){
+	MYSQL_RES* result; // MYSQL_RES struct
+	MYSQL_ROW row; //MYSQL_ROW struct
+
+	if(conn == NULL){
+		fprintf(stderr, "mysql_init() error : logInSeq\n");
+		exit(1);
+	}
+
+	if(mysql_real_connect(conn, IP, USER_ID, USER_PWD, "ftpServer_DB",
+								0, NULL, 0)){
+		finish_with_error(conn);
+	}
+
+	char* TABLE_SELECT_QUERY = "SELECT * FROM userInfo";
+
+	if(mysql_query(conn, TABLE_SELECT_QUERY)) finish_with_error(conn);
+
+	result = mysql_store_result(conn);//QUERY로 가져온 결과값을 result 구조체에 저장
+	int numF = mysql_num_fields(result);
+
+	if(result == NULL) finish_with_error(conn);
+	int login_Flag = 0;
+
+	while(row = mysql_fetch_row(result)){
+		if(strcmp(row[1], id) == 0 && strcmp(row[2], password)){
+			printf("Log-In Succeed!!\n");
+			login_Flag = 1;
+			break;
+		}
+	}
+	
+	if(login_Flag == 0) err(1, "Log-In Failed..");
+}
 void handle_session(int client) {
     send_str(client, FTP_RDY);
     int i, n, retry;
@@ -111,36 +194,20 @@ void handle_session(int client) {
 	    case ID  :								//새로 만든 CMD 명령어
 		n=recv(client, id, 20, 0);					//client가 보낸 id를 수신하는 함수
 		n=recv(client, pass, 20, 0);					//client가 보낸 password를 수신하는 함수
-		FILE *fp;							//파일 스크립터 생성
-		fp = fopen("/home/cs/ftp/myshadow", "r");			//bin폴더의 상위폴더에 있는 myshadow 파일을 여는 코드
-		for (i = 0; i < 1000000; i++) {
-			md5((uint8_t*)pass, strlen(pass), result);		//client가 보내준 암호를 MD5 알고리즘으로 암호화
-		}
-		for (i = 0; i < 16; i++){
-			sprintf(tmp, "%2.2x", result[i]);			//MD5 알고리즘 수행 후 저장된 정수를 tmp 버퍼에 string 형식으로 저장
-			strcat(passchange, tmp);				//tmp 버퍼에 저장된 결과를 passchange 버퍼에 저장
-		}
-		
-		while(!feof(fp)){						//파일의 끝이 아닐 때 까지 반복
-		fscanf(fp, "%s %s", idchk, passchk);				//파일에 저장된 id, password를 읽어와 idchk와 passchk 버퍼에 저장
-			if(strcmp(id, idchk) == 0 && strcmp(passchange, passchk) == 0){
-			//client에서 받은 id와 파일에서 읽어온 idchk를 비교
-			//client에서 받은 id의 암호화한 것(passchange)와 파일에서 읽어온 passchk를 비교
-				login = 1;					//id와 paasword 가 일치하면 login 값 1로 변경
-				break;						//로그인 성공 하면 루프 탈출
-			}
-		}
+
+		CREATE_DB();
+		logInSeq(id,pass);
+		login = 1;
 		
 		if(login){
-		printf("Login Success\n");					//server에 로그인이 성공했음을 출력
-		send_str(client, FTP_SUCCESS);					//clinet에 로그인 성공 메시지를 전송
+			printf("Login Success\n");					//server에 로그인이 성공했음을 출력
+			send_str(client, FTP_SUCCESS);					//clinet에 로그인 성공 메시지를 전송
 		}
 		else {
-		printf("Login Failed\n");					//server에 로그인이 실패했음을 출력;
-		send_str(client, FTP_FAIL);					//clinet에 로그인 실패 메시지를 전송
-		running = 0;							//client와 연결을 끊기 위해 running에 0 반환
-		}
-		fclose(fp);							//파일 스크립터를 닫음
+			printf("Login Failed\n");					//server에 로그인이 실패했음을 출력;
+			send_str(client, FTP_FAIL);					//clinet에 로그인 실패 메시지를 전송
+			running = 0;							//client와 연결을 끊기 위해 running에 0 반환
+		}											//파일 스크립터를 닫음
 		break;
             case NOOP:
                 send_str(client, FTP_OK);
