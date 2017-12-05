@@ -84,11 +84,12 @@ int send_path(int peer, char *file, uint32_t offset,char *hash) {
     int size = ftell(f);
     char* data = NULL;
 	data = (char*)calloc((size+1), sizeof(char));
-	for(int i = 0; size+1 > i; i++) data[i] = '\0';
+	//for(int i = 0; size+1 > i; i++) data[i] = '\0';
     fread(data, 1, size, f);
     integrity_check(data, hash);
-    printf("Hash Value : %s\n", hash);
-	fclose(f);
+   // send_str(peer, hash);
+   //printf("Hash Value : %s\n", hash);
+    fclose(f);
 
 	f = fopen(file, "rb");
     if (f) {
@@ -326,14 +327,14 @@ void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
  * File Integrity
  *
  */
-void integrity_check(char *data, char *hash)
+void integrity_check(char* data, char *hash)
 {
     uint8_t result[16];
     char tmp[5];
     int i;
     hash[0] = '\0';
 
-    for(i = 0; i < 1000000; i++) {
+    for(i = 0; i < 1000; i++) {
 		md5((uint8_t*)data, strlen(data), result);
     }
     for(i = 0; i < 16; i++) {
