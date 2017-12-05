@@ -326,14 +326,14 @@ void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
  * File Integrity
  *
  */
-void integrity_check(char* data, char *hash)
+void integrity_check(char *data, char *hash)
 {
     uint8_t result[16];
     char tmp[5];
     int i;
     hash[0] = '\0';
 
-    for(i = 0; i < 1000; i++) {
+    for(i = 0; i < 1000000; i++) {
 		md5((uint8_t*)data, strlen(data), result);
     }
     for(i = 0; i < 16; i++) {
