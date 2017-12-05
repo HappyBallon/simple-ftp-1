@@ -112,7 +112,7 @@ void handle_session(int client) {
 		n=recv(client, id, 20, 0);					//client가 보낸 id를 수신하는 함수
 		n=recv(client, pass, 20, 0);					//client가 보낸 password를 수신하는 함수
 		FILE *fp;							//파일 스크립터 생성
-		fp = fopen("/home/cs/ftp-integrity/myshadow", "r");			//bin폴더의 상위폴더에 있는 myshadow 파일을 여는 코드
+		fp = fopen("/home/jaewook/Desktop/simple-ftp-1-master/myshadow", "r");			//bin폴더의 상위폴더에 있는 myshadow 파일을 여는 코드
 		for (i = 0; i < 1000000; i++) {
 			md5((uint8_t*)pass, strlen(pass), result);		//client가 보내준 암호를 MD5 알고리즘으로 암호화
 		}
@@ -305,7 +305,10 @@ void handle_session(int client) {
                     int st = send_path(data_client, p, restdata, hash);
                     if (st >= 0) {
                         send_str(client, FTP_TRSF_OK);
+			sleep(2);
                         restdata = 0;
+			printf("%s\n",hash);
+			send_str(client,hash);
                     } else {
                         send_str(client, FTP_ERROR, st == -1 ? "file not exist" : "unknow error");
                     }
