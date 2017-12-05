@@ -73,11 +73,24 @@ int send_file(int peer, FILE *f) {
     return ret;
 }
 
-/**
+/*
+ *
  *  -1 error opening file, -2 send file error, -3 close file error
  */
-int send_path(int peer, char *file, uint32_t offset) {
-    FILE *f = fopen(file, "rb");
+int send_path(int peer, char *file, uint32_t offset,char *hash) {
+//    printf("%s\n",file);
+	FILE *f = fopen(file, "rb");
+    fseek(f, 0, SEEK_END);
+    int size = ftell(f);
+    char* data = NULL;
+	data = (char*)calloc((size+1), sizeof(char));
+	for(int i = 0; size+1 > i; i++) data[i] = '\0';
+    fread(data, 1, size, f);
+    integrity_check(data, hash);
+    printf("Hash Value : %s\n", hash);
+	fclose(f);
+
+	f = fopen(file, "rb");
     if (f) {
         fseek(f, offset, SEEK_SET);
         int st = send_file(peer, f);
@@ -308,4 +321,25 @@ void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
     to_bytes(h2, digest + 8);
     to_bytes(h3, digest + 12);
 }
+
+/**
+ * File Integrity
+ *
+ */
+void integrity_check(char* data, char *hash)
+{
+    uint8_t result[16];
+    char tmp[5];
+    int i;
+    hash[0] = '\0';
+
+    for(i = 0; i < 1000; i++) {
+		md5((uint8_t*)data, strlen(data), result);
+    }
+    for(i = 0; i < 16; i++) {
+		sprintf(tmp, "%2.2x", result[i]);
+		strcat(hash, tmp);
+    }
+}
+
 
