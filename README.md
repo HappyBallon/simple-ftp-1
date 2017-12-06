@@ -1,4 +1,58 @@
+Simple Ftp Explain
+===========
+파일 전송 프로그램의 간단한 구현. 여기에는 사용자를 인증하고, 원격 파일을 나열하고, 원격 파일을 검색하는 기능을 제공하는 사용자 정의 클라이언트 및 서버 프로그램이 포함됩니다.
 
+
+###Directory layout: 
+           ftp/     
+                client.c
+                server.c
+                makefile
+                myshadow
+                README
+            
+                 include/ 
+                          utils.h
+                          vars.h
+                          zlog.h
+                
+                     lib/  
+                          utils.c
+                          vars.c
+                          zlog.c
+                                             
+###Usage
+To make compile :
+```
+    cd ftp
+    make
+```
+
+To run server:
+``` 
+    cd bin
+    ./ftpd
+```
+
+To run client:
+```
+    cd bin
+    ./client IP
+```
+Available commands:
+```
+    list            
+      - retrieve list of files in the current remote directoryget <filename>  
+      - get the specified file            
+      - end the ftp session
+      - login function
+      - file integrity checking
+```
+Logging In:
+``` 
+    Name: yournickname (myshadow.txt - registry) 
+    Password: yourpassword (myshadow.txt - registry)
+```
 
 ## 수정된 기능
 
