@@ -30,8 +30,7 @@ Directory layout:
                                              
 To make compile(in Linux):
 ```
-    cd ftp
-    make
+    make
 ```
 
 To run server(in Linux):
@@ -56,8 +55,8 @@ Available commands:
 ```
 Logging In(in Linux):
 ``` 
-    Name: yournickname (myshadow.txt - registry) 
-    Password: yourpassword (myshadow.txt - registry)
+    Name: yournickname (myshadow.txt - register) 
+    Password: yourpassword (myshadow.txt - register)
 ```
 
 
