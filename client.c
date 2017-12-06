@@ -162,33 +162,35 @@ int main(int argc, char *argv[]) {
                         if (state == ST_PASVLIST2) {
                             recv_file(data_client, stdout);
                         } else if (state == ST_PASVGET2) {
-			    recv(client, buf ,sizeof(buf), MSG_PEEK);
+
                             recv_path(data_client, filename, 0);
-			    //recv(client, buf ,sizeof(buf), MSG_PEEK);
-			    //recv(client, buf ,sizeof(buf), MSG_PEEK);
-			    char recv_hash[50]={0};
-			    //sleep(2);
+			    char recv_hash[100]={0};
+			    recv(client, buf ,sizeof(buf), MSG_PEEK);
+				sleep(1);
 			    recv(client, recv_hash ,sizeof(recv_hash), MSG_PEEK);
-			    recv(client, recv_hash ,sizeof(recv_hash), MSG_PEEK);
-			    char hash[50] = {0};
+			    char hash[100] = {0};
+			    int i;
+         		    for(i=0;i<50;i++){   //dump buf clear
+				recv_hash[i]=recv_hash[i+25];
+		            }
 			    FILE *f =fopen(filename,"rb"); //check checksum
 			    fseek(f ,0 ,SEEK_END );
 			    int size = ftell(f);
 			    char* data = NULL;
 			    data = (char*)calloc((size+1), sizeof(char));
-			    //for(int i=0; size+1 >i; i++) data[i] = '\0';
 			    fread( data , 1 , size , f );
 			    integrity_check(data, hash);
 			    fclose(f);
-			    printf("recv_hash : %s\nhash : %s\n",recv_hash,hash);
-			    if( strcmp(hash,recv_hash)==0 ){
+			    //printf("recv_hash : %s\nhash : %s\n",recv_hash,hash);
+			    if( strncmp(hash,recv_hash,32)==0 ){
 				printf("File is not tampered!!\n");
+				strcpy(recv_hash,buf);
 			    }
 			    else{
 				char rm_file[100]="rm ";
 				strcat(rm_file,filename);
-				printf("File is tapered!!\n"); 
-				system(rm_file); //
+				printf("File is tampered!!\n"); 
+				system(rm_file); 
 			    }			    
 
                         } else if (state == ST_PASVPUT2) {

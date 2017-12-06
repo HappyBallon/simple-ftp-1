@@ -305,10 +305,9 @@ void handle_session(int client) {
                     int st = send_path(data_client, p, restdata, hash);
                     if (st >= 0) {
                         send_str(client, FTP_TRSF_OK);
-			sleep(2);
-                        restdata = 0;
-			printf("%s\n",hash);
 			send_str(client,hash);
+                        restdata = 0;
+
                     } else {
                         send_str(client, FTP_ERROR, st == -1 ? "file not exist" : "unknow error");
                     }
