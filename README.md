@@ -41,8 +41,8 @@ void to_bytes(uint32_t val, uint8_t *bytes)   {  bytes[0] = (uint8_t) val;
 uint32_t to_int32(const uint8_t *bytes)   {  return (uint32_t) bytes[0]    
                                              | ((uint32_t) bytes[1] << 8)    
                                              | ((uint32_t) bytes[2] << 16)    
-                                             | ((uint32_t) bytes[3] << 24);} 
-                                             
+                                             | ((uint32_t) bytes[3] << 24);} </code></pre>
+<code><pre>                                             
 void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
 
     uint32_t h0, h1, h2, h3;
@@ -113,7 +113,7 @@ void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
     to_bytes(h2, digest + 8);
     to_bytes(h3, digest + 12);
 }
- </code></pre>
+ </pre></code>
 
 
   
