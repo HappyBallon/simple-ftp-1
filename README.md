@@ -2,8 +2,13 @@ Simple Ftp Explain
 ===========
 파일 전송 프로그램의 간단한 구현. 여기에는 사용자를 인증하고, 원격 파일을 나열하고, 원격 파일을 검색하는 기능을 제공하는 사용자 정의 클라이언트 및 서버 프로그램이 포함됩니다.
 
+## 수정된 기능
++ 로그인기능
++ 파일 무결성 검사
++ 데이터베이스 구축 (Fail)
 
-###Directory layout: 
+###Directory layout:
+
            ftp/     
                 client.c
                 server.c
@@ -21,7 +26,7 @@ Simple Ftp Explain
                           vars.c
                           zlog.c
                                              
-###Usage
+                                             
 To make compile :
 ```
     cd ftp
@@ -54,11 +59,6 @@ Logging In:
     Password: yourpassword (myshadow.txt - registry)
 ```
 
-## 수정된 기능
-
-+ 로그인기능
-+ 파일 무결성 검사
-+ 데이터베이스 구축 (Fail)
 
 
 ## MD5 Hash
